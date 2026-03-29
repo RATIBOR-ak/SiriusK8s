@@ -6,12 +6,12 @@ metadata:
   name: default-deny-ingress
   namespace: netpol-demo
 spec:
-  podSelector: {}  # применить ко ВСЕМ подам
+  podSelector: {} 
   policyTypes:
   - Ingress
-  # ingress: []  — пустой список = ничего не разрешаем
+  ingress: []  # Явно указываем пустой список для блокировки
 ---
-# 2. Разрешить frontend принимать внешний трафик (от ingress)
+# 2. Разрешить frontend принимать внешний трафик
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -24,7 +24,7 @@ spec:
   policyTypes:
   - Ingress
   ingress:
-  - {}  # разрешить всем
+  - {} 
 ---
 # 3. Backend принимает только от frontend
 apiVersion: networking.k8s.io/v1
@@ -44,7 +44,7 @@ spec:
         matchLabels:
           role: frontend
 ---
-# 4. Database принимает только от backend
+# 4. Database принимает ТОЛЬКО от backend (фронт здесь не указан = ему нельзя)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -61,3 +61,6 @@ spec:
     - podSelector:
         matchLabels:
           role: backend
+    ports:
+    - protocol: TCP
+      port: 80
